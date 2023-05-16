@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('./partials/head.ejs') %>
+  <body>
+    <%- include('./partials/nav.ejs') %>
+    <div class="details content">
+      <h2 class="title"><%= blog.title %></h2>
+      <div class="content">
+          <p><%= blog.body %></p>
+      </div>
+      <a data-doc="<%=blog._id%>" class="delete">Delete</a>
+    </div>
+
+    <script>
+        const trashcan = document.querySelector('a.delete')
+        trashcan.addEventListener('click', (e) => {
+  const endpoint = `/delete/${trashcan.dataset.doc}`;
+  fetch(endpoint, {
+    method: 'DELETE'
+  })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      } else {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+    })
+    .then(data => {
+      window.location.href = data.redirect;
+    })
+    .catch(error => {
+      console.error(error);
+    });
+});
+
+    </script>
+  </body>
+</html>

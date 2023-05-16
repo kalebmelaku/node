@@ -10,8 +10,10 @@
             <h3>No Blog Available</h3>
         <%} else { %>
             <% blogs.forEach(blog => { %>
-                <h3 class="title"><%= blog.title %></h3>
-                <p class="snippet"><%= blog.snippet %></p>
+                <a class="single" href="/single/<%=blog._id%>">
+                    <h3 class="title"><%= blog.title %></h3>
+                    <p class="snippet"><%= blog.snippet %></p>
+                </a>
             <% }) %>
         <% } %>
     </div>

@@ -1,4 +1,3 @@
-const { log } = require('console');
 const express = require('express');
 const mongoose = require('mongoose');
 const Blog = require('./models/blog')
@@ -14,6 +13,7 @@ mongoose.connect(dbURI)
 
 //register view engine
 app.set('view engine', 'ejs');
+app.use(express.urlencoded({extended: true})); //uses for acceptiong form data
 
 //listen for requests
 app.listen(3000)
@@ -33,7 +33,7 @@ app.get('/add-blog', (req, res)=>{
 
 //get all blogs
 app.get('/all-blog', (req, res) => {
-    Blog.find().sort({createdAt: -1}).exec()
+    Blog.find().sort({createdAt: -1})
     .then((result) => {res.send(result)})
     .catch((err) => {console.log(err)})
 })
@@ -48,7 +48,7 @@ app.get('/single-blog', (req, res) => {
 
 
 app.get('/', (req, res) => {
-    Blog.find()
+    Blog.find().sort({createdAt: -1})
     .then((result) =>{
         res.render('index', {title: 'Home Page', blogs: result});
     })
@@ -62,6 +62,31 @@ app.get('/about', (req, res) => {
     // res.send('<p>About Page</p>')
     res.render('about', {title: 'About Page'});
 })
+app.get('/single/:id', (req, res) => {
+    const id = req.params.id;
+    Blog.findById(id)
+    .then((result) => {res.render('single', {title: 'single blog', blog: result});})
+    .catch((err) => {res.render('404', {title: 'error'})})
+    // res.render('single', {title: 'single blog'});
+})
+
+app.post('/blogs', (req, res) => {
+    const blog = new Blog({
+        title: req.body.title,
+        snippet: req.body.snippet,
+        body: req.body.body
+    });
+    blog.save()
+    .then(response => res.redirect('/'))
+    .catch(err => console.log(err));
+})
+
+app.delete('/delete/:id', (req, res) => {
+    const id = req.params.id;
+    Blog.findByIdAndDelete(id)
+    .then(result =>{res.json({redirect: '/ '})})
+    .catch(err => console.error(err))
+  });
 
 app.get('/blogs/create', (req, res) => {
     res.render('create', {title: 'Create Blog'})
